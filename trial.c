@@ -3,7 +3,6 @@
 #define MODE 0
 #define DATA_SIZE 2880
 
-#include <wiringPiSPI.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,31 +13,12 @@
 	uint8_t output_1[2880];
 	uint8_t output_2[2880];
 	
-	uint8_t input[2880];
-
-void setup_rpi_spi()
-{
-     //   if( wiringPiSPISetupMode (CHANNEL,SPEED,MODE)==-1)
-        if( wiringPiSPISetup(CHANNEL,SPEED)==-1)
-        {
-                perror("Could not initialise SPI\n");
-                exit(0);
-        }
-
-}
-
 
 int main(int argc, char **argv)
 {
-	int spi_fd=0;
-	int flag=0;
-
-	setup_rpi_spi();
-
-	spi_fd=wiringPiSPIGetFd(CHANNEL);
-
-
 	int i=0,j=0;
+
+	int flag=0;
 
 	FILE *fd=fopen("frame.txt","r");
 
@@ -72,23 +52,12 @@ int main(int argc, char **argv)
 		fseek(fd,3,SEEK_CUR);
 		buff=fgetc(fd);
 	}
-
-	write(spi_fd,output_1,DATA_SIZE);
-
-	read(spi_fd,input,DATA_SIZE);
+	
 	for(i=0;i<DATA_SIZE;i++)
 	{
-		printf("%x\t",input[i]);
+		printf("%d-->%x\t",i,output_1[i]);
+		printf("%x\n",output_2[i]);
 	}
 
-sleep(1);
-
-	write(spi_fd,output_2,DATA_SIZE);
-
-	read(spi_fd,input,DATA_SIZE);
-	for(i=0;i<DATA_SIZE;i++)
-	{
-		printf("%x\t",input[i]);
-	}
-	return 0;
+	fclose(fd);
 }
