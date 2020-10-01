@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
 	int i=0,j=0;
 
-	FILE *fd=fopen("frame.txt","r");
+	FILE *fd=fopen(argv[1],"r");
 
 	unsigned char temp[4];
 
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 			flag=1;
 		}
 
-		(flag==0)?(output_1[j++]=atoi(temp)):(output_2[j++]=atoi(temp));
+		((flag==0)&&(j%2==0))?(output_1[j++]=atoi(temp)):(output_2[j++]=atoi(temp));
 
 		strcpy(temp,"000\0");
 
