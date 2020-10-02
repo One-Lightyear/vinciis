@@ -2,7 +2,9 @@
 #define SPEED 12500000
 #define MODE 0
 #define DATA_SIZE 2880
+#define LED 0
 
+#include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -18,7 +20,6 @@
 
 void setup_rpi_spi()
 {
-     //   if( wiringPiSPISetupMode (CHANNEL,SPEED,MODE)==-1)
         if( wiringPiSPISetup(CHANNEL,SPEED)==-1)
         {
                 perror("Could not initialise SPI\n");
@@ -30,6 +31,15 @@ void setup_rpi_spi()
 
 int main(int argc, char **argv)
 {
+	if(argc!=2)
+	{
+		printf("Invalid arguements\n");
+		exit(1);
+	}
+
+	wiringPiSetup();
+	pinMode(LED, OUTPUT);
+
 	int spi_fd=0;
 	int flag=0;
 
@@ -72,23 +82,28 @@ int main(int argc, char **argv)
 		fseek(fd,3,SEEK_CUR);
 		buff=fgetc(fd);
 	}
-
+	
+	digitalWrite (LED, HIGH);
 	write(spi_fd,output_1,DATA_SIZE);
-
 	read(spi_fd,input,DATA_SIZE);
 	for(i=0;i<DATA_SIZE;i++)
 	{
 		printf("%x\t",input[i]);
 	}
+	digitalWrite (LED, LOW);
 
-sleep(1);
+/*_____________________________________________________________________*/
 
+	delay(1000);
+
+	digitalWrite (LED, HIGH);
 	write(spi_fd,output_2,DATA_SIZE);
-
 	read(spi_fd,input,DATA_SIZE);
 	for(i=0;i<DATA_SIZE;i++)
 	{
 		printf("%x\t",input[i]);
 	}
+	digitalWrite (LED, LOW);
+	
 	return 0;
 }
