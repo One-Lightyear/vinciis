@@ -27,7 +27,8 @@ void setup_rpi_spi()
 
 int main(int argc, char ** argv)
 {
-	if(argc!=2)
+	puts("arguments: file_to_read delay divide_factor")
+	if(argc!=4)
 	{
 		printf("Invalid arguements\n");
 		exit(1);
@@ -44,7 +45,7 @@ int main(int argc, char ** argv)
 	unsigned long total_size=0;
 	
 	uint8_t buffer[DATA_SIZE];
-	int buffer_count=0;
+	unsigned int buffer_count=0;
 	uint8_t input[DATA_SIZE];
 
 	char temp[9];
@@ -53,7 +54,8 @@ int main(int argc, char ** argv)
 
 	FILE *fd1=fopen(argv[1],"r");
 
-	int flag=0,fx=0;
+	int flag_delay=0,i=0;
+	uint8_t divide_factor=atoi(argv[3]);
 
 	while(1)
 	{
@@ -62,7 +64,7 @@ int main(int argc, char ** argv)
 		if((feof(fd1)!=0)||((ok>=0)&&(ok<20)))
 		{
 			temp[j]='\0';
-			buffer[buffer_count++]=atoi(temp);
+			buffer[buffer_count++]=atoi(temp)/divide_factor;
 			
 			
 			digitalWrite (TRIGGER, HIGH);
@@ -85,9 +87,8 @@ int main(int argc, char ** argv)
 		if((ok!=' ')) temp[j++]=ok;
 		else
 		{
-		//	fseek(fd1,1,SEEK_CUR);
 			temp[j]='\0';
-			buffer[buffer_count++]=atoi(temp);
+			buffer[buffer_count++]=atoi(temp)/divide_factor;
 			j=0;
 		}
 
@@ -106,11 +107,19 @@ int main(int argc, char ** argv)
         		}
 
         		digitalWrite (TRIGGER, LOW);
-			delay(1000);
+
+			if (flag_delay==0)
+			{
+				flag_delay=1;
+			}
+			else
+			{
+				delay(atoi(argv[2]));
+				flag_delay=0;
+			}
 		}
 	}
 	fclose(fd1);
-
 
 	printf("Total data transferred = %d bytes\n",total_size);
 }
